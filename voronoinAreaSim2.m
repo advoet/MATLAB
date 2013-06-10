@@ -1,4 +1,4 @@
-function [Areas] = voronoinAreaSim(numpoints,timesteps)
+function [Areas] = voronoinAreaSim2(numpoints,timesteps)
 %% Returns a (1 x timesteps) cell array, each cell of which contiains an
 %%array consisting of all of the areas of individual cells in the voronoi
 %%diagram followed by a trail of -1's (representing areas that had a
@@ -14,20 +14,9 @@ import containers.Map;
 
     Areas = cell(1,timesteps);
 
-    %RANDOM POINTS
     points_left = numpoints;
     x = rand(points_left,1);
     y = rand(points_left,1);
-    
-%     %UNIFORMLY DISTRIBUTED POINTS - Each cell has same area regardless    
-%     x = .025:.05:.975;
-%     y = .025:.05:.975;
-%     [x,y] = meshgrid(x,y);
-%     x = x(:);
-%     y = y(:);
-
-    
-    
 
     points = [x,y];
 
@@ -35,14 +24,49 @@ import containers.Map;
     %timestep looping procedure
     for i = 1:timesteps
           
+         %% MANUAL AREA CODE USING POLYAREA
+        %compute areas
         
-        %% BORROWED CELL AREA CODE USING BOUNDED SQUARE
+        dt = DelaunayTri(x,y);
+        [vertices vcells] = voronoiDiagram(dt);
         
+        %workaround for voronoi vertices that lie outside of the square
         
-        [CellArea, dt] = SquareBV(points(:,1),points(:,2),0,[0,1,0,1]);
-        Areas{i} = CellArea;
+        %tic
         
+       for m = 1:length(vertices)
+            if vertices(m,1)>1 || vertices(m,2)>1 || vertices(m,1)<0 || vertices(m,2)<0
+                vertices(m,1) = Inf;
+                vertices(m,2) = Inf;
+            end
         
+            % If we want to plot the voronoi
+            %voronoi(points(:,1),points(:,2));
+            %hold on;
+
+            k=1;
+            Areas{i} = -ones(size(vcells));
+            for j = 1 : length (vcells)
+                xpoints = vertices(vcells{j,:},1); 
+                ypoints = vertices(vcells{j,:},2);
+                area = polyarea (xpoints,ypoints);
+                %fill(xpoints,ypoints, 'r')     if we have a vornoi diagram,
+                                               %visually fills the polygons we 
+                                               %compute areas of
+                if (isnan(area))
+                    continue;           %Skips the areas that include infinity
+                end
+                Areas{i}(k) = area;     %inputs area, then increments counter
+                k = k+1;                %in order to maintain a trail of -1's
+            end
+       end
+        %myAreaTime = toc
+        
+        %hold off;
+        
+        %NOTE: not all of the area matrix will be filled, the remainder will be
+        %filled with -1's to prevent ambiguity
+
         %% NEIGHBOR GETTING CODE
         % creates a set (each entry unique) of neighbor pairs (edge connecting
         % the two vertices) in the delaunay triangulation. Each neighbor
