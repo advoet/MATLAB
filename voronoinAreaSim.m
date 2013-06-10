@@ -14,18 +14,20 @@ import containers.Map;
 
     Areas = cell(1,timesteps);
 
-    %points_left = numpoints;
-    %x = rand(points_left,1);
+    %RANDOM POINTS
+    points_left = numpoints;
+    x = rand(points_left,1);
+    y = rand(points_left,1);
     
-    x = .025:.05:.975;
-    y = .025:.05:.975;
+%     %UNIFORMLY DISTRIBUTED POINTS - Each cell has same area regardless    
+%     x = .025:.05:.975;
+%     y = .025:.05:.975;
+%     [x,y] = meshgrid(x,y);
+%     x = x(:);
+%     y = y(:);
+
     
-    [x,y] = meshgrid(x,y);
     
-    x = x(:);
-    y = y(:);
-    
-    %y = rand(points_left,1);
 
     points = [x,y];
 
