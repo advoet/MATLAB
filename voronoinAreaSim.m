@@ -13,15 +13,19 @@ function [Areas] = voronoinAreaSim(numpoints,timesteps)
 import containers.Map;
    
     Areas = cell(1,timesteps);
+
     
-    %RANDOMLY DISTRIBUTED POINTS
+    %RANDOM POINT DISTRIBUTION
     x = rand(numpoints,1);
     y = rand(numpoints,1);
     
-%     %UNIFORMLY DISTRIBUTED POINTS - Each cell has same area regardless    
-%     x = .025:.05:.975;
-%     y = .025:.05:.975;
+    
+%     %UNIFORM POINT DISTRIBUTION
+%     x = .05:.05:.95;
+%     y = .05:.05:.95;
+%     
 %     [x,y] = meshgrid(x,y);
+%     
 %     x = x(:);
 %     y = y(:);
     
@@ -47,24 +51,46 @@ import containers.Map;
         % pair corresponds to vertices whose cells share a point in the
         % voronoi diagram. Then selects a random neighbor pair to remove
         % from the set of points and in place adds it's midpoint
-
-
-        neighborSet =[];
+        
+        neighborSet = containers.Map();
         for k = 1:length(dt)
             for j = 1:3
                 vertex1 = dt.Triangulation( k,(mod(j,3)+1));
                 vertex2 = dt.Triangulation(k,mod(j+1,3)+1);
                 if(vertex1<vertex2)
-                    neighborSet = union(neibhborSet,[[vertex1,vertex2]],'rows');
+                    neighborSet(strcat(int2str(vertex1),',',int2str(vertex2))) = [vertex1,vertex2];
                 else
-                   neighborSet = union(neibhborSet,[[vertex2,vertex1]],'rows');
+                    neighborSet(strcat(int2str(vertex2),',',int2str(vertex1))) = [vertex2,vertex1];
                 end
             end
         end
+ 
+        keySet = keys(neighborSet);
+       
+        pair_to_remove = randi(length(keySet));
         
-        pair_to_remove = randi(length(neighborSet));
-        [vertex1] = neighborSet(pair_to_remove,1);
-        [vertex2] = neighborSet(pair_to_remove,2);
+        pair = values(neighborSet,keySet(pair_to_remove));
+        
+        vertex1 = pair{1}(1);
+        vertex2 = pair{1}(2);
+
+
+%         neighborSet =[];
+%         for k = 1:length(dt)
+%             for j = 1:3
+%                 vertex1 = dt.Triangulation( k,(mod(j,3)+1));
+%                 vertex2 = dt.Triangulation(k,mod(j+1,3)+1);
+%                 if(vertex1<vertex2)
+%                     neighborSet = union(neibhborSet,[[vertex1,vertex2]],'rows');
+%                 else
+%                    neighborSet = union(neibhborSet,[[vertex2,vertex1]],'rows');
+%                 end
+%             end
+%         end
+%         
+%         pair_to_remove = randi(length(neighborSet));
+%         [vertex1] = neighborSet(pair_to_remove,1);
+%         [vertex2] = neighborSet(pair_to_remove,2);
         
         x1 = points(vertex1,1); y1 = points(vertex1,2);
         x2 = points(vertex2,1); y2 = points(vertex2,2);
