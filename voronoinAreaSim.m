@@ -13,36 +13,19 @@ function [Areas] = voronoinAreaSim(numpoints,timesteps)
 import containers.Map;
    
     Areas = cell(1,timesteps);
-
-<<<<<<< HEAD:voronoinAreaSim.m
-    %RANDOM POINTS
-=======
->>>>>>> 07bc29401c369a4d09c300b2df44fef989e007e9:voronoinAreaSim.m~
-    points_left = numpoints;
-    x = rand(points_left,1);
-    y = rand(points_left,1);
     
-<<<<<<< HEAD:voronoinAreaSim.m
+    %RANDOMLY DISTRIBUTED POINTS
+    x = rand(numpoints,1);
+    y = rand(numpoints,1);
+    
 %     %UNIFORMLY DISTRIBUTED POINTS - Each cell has same area regardless    
 %     x = .025:.05:.975;
 %     y = .025:.05:.975;
 %     [x,y] = meshgrid(x,y);
 %     x = x(:);
 %     y = y(:);
-
-    
-    
-=======
-%     x = .05:.05:.95;
-%     y = .05:.05:.95;
-%     
-%     [x,y] = meshgrid(x,y);
-%     
-%     x = x(:);
-%     y = y(:);
     
    
->>>>>>> 07bc29401c369a4d09c300b2df44fef989e007e9:voronoinAreaSim.m~
 
     points = [x,y];
 
@@ -64,30 +47,6 @@ import containers.Map;
         % pair corresponds to vertices whose cells share a point in the
         % voronoi diagram. Then selects a random neighbor pair to remove
         % from the set of points and in place adds it's midpoint
-        
-%         neighborSet = containers.Map();
-%         for k = 1:length(dt)
-%             for j = 1:3
-%                 vertex1 = dt.Triangulation( k,(mod(j,3)+1));
-%                 vertex2 = dt.Triangulation(k,mod(j+1,3)+1);
-%                 if(vertex1<vertex2)
-%          %           neighborSet(strcat(int2str(vertex1),',',int2str(vertex2))) = [vertex1,vertex2];
-%                     neighborSet = union(neibhborSet,[[vertex1,vertex2]],'rows');
-%                 else
-%                 %    neighborSet(strcat(int2str(vertex2),',',int2str(vertex1))) = [vertex2,vertex1];
-%                    neighborSet = union(neibhborSet,[[vertex2,vertex1]],'rows');
-%                 end
-%             end
-%         end
-%  
-%         keySet = keys(neighborSet);
-%        
-%         pair_to_remove = randi(length(keySet));
-%         
-%         pair = values(neighborSet,keySet(pair_to_remove));
-%         
-%         vertex1 = pair{1}(1);
-%         vertex2 = pair{1}(2);
 
 
         neighborSet =[];
