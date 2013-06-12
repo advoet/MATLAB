@@ -52,7 +52,28 @@ import containers.Map;
         % voronoi diagram. Then selects a random neighbor pair to remove
         % from the set of points and in place adds it's midpoint
         
-        
+%         neighborSet = containers.Map();
+%         for k = 1:length(dt)
+%             for j = 1:3
+%                 vertex1 = dt.Triangulation( k,(mod(j,3)+1));
+%                 vertex2 = dt.Triangulation(k,mod(j+1,3)+1);
+%                 if(vertex1<vertex2)
+%                     neighborSet(strcat(int2str(vertex1),',',int2str(vertex2))) = [vertex1,vertex2];
+%                 else
+%                     neighborSet(strcat(int2str(vertex2),',',int2str(vertex1))) = [vertex2,vertex1];
+%                 end
+%             end
+%         end
+%  
+%         keySet = keys(neighborSet);
+%        
+%         pair_to_remove = randi(length(keySet));
+%         
+%         pair = values(neighborSet,keySet(pair_to_remove));
+%         
+%         vertex1 = pair{1}(1);
+%         vertex2 = pair{1}(2);
+
         init_pt1 = dt.Triangulation(1,1);
         init_pt2 = dt.Triangulation(1,2);
         neighborSet = [min(init_pt1,init_pt2),max(init_pt1,init_pt2)];
@@ -60,9 +81,8 @@ import containers.Map;
             for j = 1:3
                 vertex1 = dt.Triangulation( k,(mod(j,3)+1));
                 vertex2 = dt.Triangulation(k,mod(j+1,3)+1);
-                neighborSet = union(neighborSet, ...
-                    [min(vertex1,vertex2),max(vertex1,vertex2)],'rows');
-                
+                neighborSet = union(neighborSet,[min(vertex1,vertex2),max(vertex1,vertex2)],'rows');
+                end
             end
         end
         
