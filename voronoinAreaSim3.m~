@@ -53,28 +53,38 @@ import containers.Map;
         end
         
         
-        
-        k=1;
+        %areas of edge cells for now will be given -1
         Areas{i} = -ones(size(vcells));
-        for j = 1 : length (vcells)
-            xpoints = vertices(vcells{j,:},1); 
-            ypoints = vertices(vcells{j,:},2);
-            area = polyarea (xpoints,ypoints);
-            
-            %if we have a vornoi diagram, visually fills the polygons we 
-            %compute areas
-            
-            if visual
-                fill(xpoints,ypoints, 'r')     
-            end
-            
-            if (isnan(area))
-                continue;           %Skips the areas that include infinity
-            end
-            Areas{i}(k) = area;     %inputs area, then increments counter
-            k = k+1;                %in order to maintain a trail of -1's
-        end
         
+        
+        if i>2
+            
+            %get original cells
+            
+            %get their neighbors
+            
+            %recompute areas
+            
+            
+        else
+            for j = 1 : length (vcells)
+                xpoints = vertices(vcells{j,:},1); 
+                ypoints = vertices(vcells{j,:},2);
+                area = polyarea (xpoints,ypoints);
+
+                %if we have a vornoi diagram, visually fills the polygons we 
+                %compute areas
+
+                if visual
+                    fill(xpoints,ypoints, 'r')     
+                end
+
+                if (isnan(area))
+                    continue;           %Skips the areas that include infinity
+                end
+                Areas{i}(j) = area;     
+            end
+        end
         %NOTE: not all of the area matrix will be filled, the remainder will be
         %filled with -1's to prevent ambiguity
         
@@ -97,6 +107,40 @@ import containers.Map;
         pair_to_remove = randi(length(neighborSet));
         [vertex1] = neighborSet(pair_to_remove,1);
         [vertex2] = neighborSet(pair_to_remove,2);
+        
+        
+        
+        
+        
+        
+        
+        %gets the indices of each appearance of either vertex in the list
+        %of edges in order to find the neighbors
+        [v1_x_indices,v1_y_indices] = find(neighborSet==vertex1);
+        [v2_x_indices,v2_y_indices] = find(neighborSet==vertex2);
+        
+        %toggles y index to get opposite end of edge aka voronoi neighbor
+        v1_y_indices = 3.-v1_y_indices;
+        v2_y_indices = 3.-v2_y_indices;
+        
+        toUpdate1 = ones(size(v1_y_indices));
+        toUpdate2 = ones(size(v2_y_indices));
+        
+        for p = 1:length(toUpdate1)
+            toUpdate1(p) = neighborSet(v1_x_indices(p),v1_y_indices(p));
+        end
+        
+        for q = 1:length(toUpdate2)
+            toUpdate2(q) = neighborSet(v2_x_indices(q),v2_y_indices(q));
+        end
+        
+        toUpdate = union(toUpdate1,toUpdate2);
+        
+        toUpdate = setdiff(toUpdate,[vertex1,vertex2]);
+        
+        
+        
+        
         
         if visual
            fill( vertices(vcells{vertex1,:},1), vertices(vcells{vertex1,:},2),'g');
