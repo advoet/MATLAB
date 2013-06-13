@@ -1,4 +1,4 @@
-function [CellArea, dt] =SquareBV(x,y,toggleplot,varargin)
+function [CellArea] =SquareBV(x,y,dt,toggleplot,varargin)
 
 % SQUAREBV   Arbitrary Square Bounded Voronoi Diagram
 % This function compute the individual Voronoi cell area of point sets
@@ -73,7 +73,6 @@ y_VoronoiGlobal = y;
 
 %ADDED BY AV 6/6/2013 in order to get delaunay triangulation for other
 %calculation
-dt = DelaunayTri(x,y);
 [V, C] = voronoiDiagram(dt);
 
 if toggleplot

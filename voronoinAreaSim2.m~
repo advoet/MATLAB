@@ -14,7 +14,7 @@ import containers.Map;
 
 
 
-    visual = true;
+    visual = false;
 
 
 
@@ -103,7 +103,6 @@ import containers.Map;
         
         if visual
            fill( vertices(vcells{vertex1,:},1), vertices(vcells{vertex1,:},2),'g');
-           getframe();
            fill( vertices(vcells{vertex2,:},1), vertices(vcells{vertex2,:},2),'g');
            getframe();
         end
