@@ -1,4 +1,4 @@
-function [Areas] = voronoinAreaSim2(numpoints,timesteps)
+function [Areas] = voronoinAreaSim3(numpoints,timesteps)
 %% Returns a (1 x timesteps) cell array, each cell of which contiains an
 %%array consisting of all of the areas of individual cells in the voronoi
 %%diagram followed by a trail of -1's (representing areas that had a
@@ -14,7 +14,7 @@ import containers.Map;
 
 
 
-    visual = true;
+    visual = false;
 
 
 
@@ -29,9 +29,7 @@ import containers.Map;
 
     %timestep looping procedure
     for i = 1:timesteps
-          
         %% MANUAL AREA CODE USING POLYAREA
-        %compute areas
         
         dt = DelaunayTri(points(:,1),points(:,2));
         [vertices vcells] = voronoiDiagram(dt);
@@ -59,12 +57,56 @@ import containers.Map;
         
         if i>2
             
-            %get original cells
+            %fill Areas cell with previous area values
+            for j=1:vertex2-1
+                Areas{i}(j) = Areas{i-1}(j);
+            end
+            for j=vertex2:length(Areas{i-1})-1;
+                Areas{i}(j) = Areas{i-1}(j+1);
+            end
             
-            %get their neighbors
             
-            %recompute areas
             
+            %the midpoint of vertex 1 and vertex 2 replaces  vertex 1, so 
+            %recompute its area. NOTE: we do not check if vertex1>vertex2
+            %since the edge list is sorted 
+            xpoints = vertices(vcells{vertex1,:},1); 
+            ypoints = vertices(vcells{vertex1,:},2);
+            area = polyarea(xpoints,ypoints);
+            
+            if visual
+                fill(xpoints,ypoints, 'b');
+                getframe();
+            end
+            
+            %Skips the areas that include infinity
+            if (~isnan(area))
+                Areas{i}(vertex1) = area;
+            end
+            
+            
+            %Account for removal of vertex2 from the list of vertices
+            for h = 1:length(toUpdate)
+                
+                vertex = toUpdate(h);
+                
+                if vertex>=vertex2
+                    vertex = vertex-1;
+                end
+                
+                xpoints = vertices(vcells{vertex,:},1);
+                ypoints = vertices(vcells{vertex,:},2);
+                area = polyarea(xpoints,ypoints);
+                if visual
+                    fill(xpoints,ypoints, 'b');
+                    getframe();
+                end
+                %Skips the areas that include infinity
+                if (~isnan(area))
+                    Areas{i}(vertex) = area;
+                end
+                
+            end
             
         else
             for j = 1 : length (vcells)
@@ -136,9 +178,15 @@ import containers.Map;
         
         toUpdate = union(toUpdate1,toUpdate2);
         
+        %toUpdate is now the list of unique neighbors of either vertex1 or
+        %vertex2 without repeats or inclusion of vertex1 or vertex2
+        %themseleves
         toUpdate = setdiff(toUpdate,[vertex1,vertex2]);
         
-        
+        %check if order preserved in the new triangulation. Probably not,
+        %so we may have to manually update the DT calc. ACTUALLY!!!!!!!!!!!
+        %We can get the actual locations of the points from this list and
+        %then find them in the new triangulation.
         
         
         

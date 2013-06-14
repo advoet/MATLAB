@@ -14,7 +14,7 @@ import containers.Map;
 
 
 
-    visual = true;
+    visual = false;
 
 
 

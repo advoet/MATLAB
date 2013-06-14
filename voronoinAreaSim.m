@@ -41,7 +41,7 @@ function [Areas] = voronoinAreaSim(numpoints,timesteps)
         %% BORROWED CELL AREA CODE USING BOUNDED SQUARE
      
         dt = DelaunayTri(points(:,1),points(:,2));
-        [CellArea] = SquareBV(x,y,dt,0,[0,1,0,1]);
+        [CellArea] = SquareBV(points(:,1),points(:,2),dt,0,[0,1,0,1]);
         Areas{i} = CellArea;
         %% NEIGHBOR GETTING CODE
         % creates a set (each entry unique) of neighbor pairs (edge connecting

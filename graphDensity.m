@@ -24,7 +24,7 @@ for i = 1:length(Areas)
     %consider making the x bound some multiple of the expected area size
     %remaining for the number of points at the end (i.e
     %1/length(Areas{length(Areas)})
-    axis([0, 4*1/length(Areas{length(Areas)}), ...
+    axis([0, .04, ...
         0,.7*length(Areas{1})]);
     
     
