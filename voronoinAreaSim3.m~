@@ -20,20 +20,32 @@ import containers.Map;
 
     Areas = cell(1,timesteps);
 
+    %RANDOM POINT DISTRIBUTION
     points_left = numpoints;
     x = rand(points_left,1);
     y = rand(points_left,1);
 
+    
+        %UNIFORM POINT DISTRIBUTION
+    x = .01:.02:.99;
+    y = .01:.02:.99;
+    
+   [x,y] = meshgrid(x,y);
+    
+    x = x(:);
+    y = y(:);
+    
+    
     points = [x,y];
 
-
+    dt = DelaunayTri(points(:,1),points(:,2));
+    
+    
+    
     %timestep looping procedure
     for i = 1:timesteps
-        %% MANUAL AREA CODE USING POLYAREA
-        
-        dt = DelaunayTri(points(:,1),points(:,2));
+        %% MANUAL AREA CODE USING POLYAREAc
         [vertices vcells] = voronoiDiagram(dt);
-        
         
         %%  deal with points that meet outside of the square
         for m = 1:length(vertices)
@@ -55,7 +67,7 @@ import containers.Map;
         Areas{i} = -ones(size(vcells));
         
         
-        if i>2
+        if i>=2
             
             %fill Areas cell with previous area values
             for j=1:vertex2-1
@@ -66,7 +78,7 @@ import containers.Map;
             end
             
             
-            
+           
             %the midpoint of vertex 1 and vertex 2 replaces  vertex 1, so 
             %recompute its area. NOTE: we do not check if vertex1>vertex2
             %since the edge list is sorted 
@@ -108,7 +120,9 @@ import containers.Map;
                 
             end
             
+            
         else
+            
             for j = 1 : length (vcells)
                 xpoints = vertices(vcells{j,:},1); 
                 ypoints = vertices(vcells{j,:},2);
@@ -212,5 +226,7 @@ import containers.Map;
         if visual
             hold off;
         end
+        
+        
     end
 end

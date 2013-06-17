@@ -30,10 +30,17 @@ for i = 1:lenArray
     y = y./ (dx*(length(newArea)));
     
     %Plotting Density function. 
+    
+    
     bar(X,y);
     axis([0, endBound, 0, 2]);
-    
     m(i) = getframe();
+    
+    %if mod(i,10) == 0;
+     %   bar(X,y);
+      %  axis([0, endBound, 0, 2]);
+      %  m(i/10) = getframe();
+    %end
 
 
 end

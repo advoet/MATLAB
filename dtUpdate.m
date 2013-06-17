@@ -1,4 +1,4 @@
-function [newDT] = dtUpdate(dt,neighborSet,vertex1,vertex2,midpoint)
+function [newDT] = dtUpdate(dt,toUpdate,vertex1,vertex2,midpoint)
 %% DESCRIPTION
 % Takes the previous delaunay triangulation, the generated set of neighbors
 % in the triangulation, the vertices to be removed, and their midpoint and
@@ -7,6 +7,8 @@ function [newDT] = dtUpdate(dt,neighborSet,vertex1,vertex2,midpoint)
 %
 % dt.X is the list of dt points
 
+
+    
 
 
     return newDT

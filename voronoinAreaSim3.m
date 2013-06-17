@@ -20,21 +20,34 @@ import containers.Map;
 
     Areas = cell(1,timesteps);
 
+    %RANDOM POINT DISTRIBUTION
     points_left = numpoints;
     x = rand(points_left,1);
     y = rand(points_left,1);
 
+    
+%         %UNIFORM POINT DISTRIBUTION
+%     x = .01:.02:.99;
+%     y = .01:.02:.99;
+%     
+%    [x,y] = meshgrid(x,y);
+    
+    x = x(:);
+    y = y(:);
+    
+    
     points = [x,y];
 
-
+    dt = DelaunayTri(points(:,1),points(:,2));
+    
+    
+    
     %timestep looping procedure
     for i = 1:timesteps
-        %% MANUAL AREA CODE USING POLYAREA
+        %% MANUAL AREA CODE USING POLYAREAc
         
-        dt = DelaunayTri(points(:,1),points(:,2));
+        
         [vertices vcells] = voronoiDiagram(dt);
-        
-        
         %%  deal with points that meet outside of the square
         for m = 1:length(vertices)
            
@@ -46,7 +59,7 @@ import containers.Map;
             % If we want to plot the voronoi
             
         if visual    
-            voronoi(points(:,1),points(:,2));
+            voronoi(dt.X(:,1),dt.X(:,2));
             hold on;
         end
         
@@ -55,7 +68,7 @@ import containers.Map;
         Areas{i} = -ones(size(vcells));
         
         
-        if i>2
+        if i>=2
             
             %fill Areas cell with previous area values
             for j=1:vertex2-1
@@ -66,7 +79,7 @@ import containers.Map;
             end
             
             
-            
+           
             %the midpoint of vertex 1 and vertex 2 replaces  vertex 1, so 
             %recompute its area. NOTE: we do not check if vertex1>vertex2
             %since the edge list is sorted 
@@ -108,7 +121,9 @@ import containers.Map;
                 
             end
             
+            
         else
+            
             for j = 1 : length (vcells)
                 xpoints = vertices(vcells{j,:},1); 
                 ypoints = vertices(vcells{j,:},2);
@@ -197,14 +212,14 @@ import containers.Map;
            getframe();
         end
 
-        x1 = points(vertex1,1); y1 = points(vertex1,2);
-        x2 = points(vertex2,1); y2 = points(vertex2,2);
+        x1 = dt.X(vertex1,1); y1 = dt.X(vertex1,2);
+        x2 = dt.X(vertex2,1); y2 = dt.X(vertex2,2);
 
         midpoint = [(x1+x2)/2, (y1+y2)/2];
 
-        points(vertex1,:) = midpoint;
-        points(vertex2,:) = [];
-
+        
+        dt.X(vertex1,:) = midpoint;
+        dt.X(vertex2,:) = [];
         %When you remove a point you only mess with the triangulation a
         %bit, maybe manually change the triangulation and plug it back into
         %squarebv instead of evaluating each time
@@ -212,5 +227,12 @@ import containers.Map;
         if visual
             hold off;
         end
+        
+        
+        % apparently dt automatically recomputes itself when you add/remove
+        % points, so implemented that. I wish we still didnt have to reget
+        % the voronoi from there but i think its fine
+        
+        
     end
 end
