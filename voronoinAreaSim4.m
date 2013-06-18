@@ -1,4 +1,9 @@
 function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoints,timesteps)
+
+%PERIODIC SIMULATION, ONLY COMPUTES THE AREAS OF THE POINTS IN THE MIDDLE
+%CELL, PERIODIC CONSTRAINT FORCES AREAS TO WRAP AROUND AND STILL TOTAL 1
+
+
 %% Returns 
 % Areas - (1 x timesteps) cell array, each cell of which contiains an
 %array consisting of all of the areas of individual cells in the voronoi
@@ -14,7 +19,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
 %
 % AreaRedist - 1xtimesteps cell array in which each cell contains a list of
 % the percent change of each neighbor whose area changes at the given
-% timestep
+% timestep DOESNT WORK YET, NOT SURE WHAT THIS VALUE SHOULD REALLY BE
 
 %% Description
 % Constructs a voronoi diagram with (numpoints) points, then for each
@@ -47,7 +52,8 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
     x = x(:);
     y = y(:);
     
-    
+    %create the periodic mesh
+    [x,y] = voronoiPrep(x,y);
     points = [x,y];
 
     dt = DelaunayTri(points(:,1),points(:,2));
@@ -60,15 +66,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
         
         
         [vertices vcells] = voronoiDiagram(dt);
-        %%  deal with points that meet outside of the square
-        for m = 1:length(vertices)
-           
-            if vertices(m,1)>1 || vertices(m,2)>1 || vertices(m,1)<0 || vertices(m,2)<0
-                vertices(m,1) = Inf;
-                vertices(m,2) = Inf;
-            end
-        end
-            % If we want to plot the voronoi
+        
             
         if visual    
             voronoi(dt.X(:,1),dt.X(:,2));
@@ -76,8 +74,8 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
         end
         
         
-        %areas of edge cells for now will be given -1
-        Areas{i} = -ones(size(vcells));
+        %all areas can be computed for middle vertex set. initialize to -1
+        Areas{i} = -ones(size(vcells)/9);
         
         
         if i>=2
@@ -117,9 +115,12 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
                 Areas{i}(vertex1) = -1;
             end
             
+            
+            AreaRedist{i-1} = -2*ones(size(toUpdate));
+            
             %Account for removal of vertex2 from the list of vertices
             for h = 1:length(toUpdate)
-                AreaRedist{i-1} = zeros(size(toUpdate));
+                
                 vertex_shifted = false;
                 
                 vertex = toUpdate(h);

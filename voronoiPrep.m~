@@ -1,8 +1,8 @@
 function [X,Y] = voronoiPrep(X0,Y0);
 
 
-%creates a periodic set of shifts of the given inputs to form a 3x3 grid
-%around the original square. 
+%creates a periodic set of shifts of the given inputs to f
+
 
 
 X1 = {X0-ones(1,points);X0;X0+ones(1,points)};

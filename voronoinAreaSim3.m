@@ -1,25 +1,37 @@
-function [Areas] = voronoinAreaSim3(numpoints,timesteps)
-%% Returns a (1 x timesteps) cell array, each cell of which contiains an
-%%array consisting of all of the areas of individual cells in the voronoi
-%%diagram followed by a trail of -1's (representing areas that had a
-%%vertex at infinity)
+function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoints,timesteps)
+%% Returns 
+% Areas - (1 x timesteps) cell array, each cell of which contiains an
+%array consisting of all of the areas of individual cells in the voronoi
+%diagram along with values of -1 (representing areas that had a
+%vertex at infinity)
+%
+% AreaChange -  1x(timesteps-1) array with values of the ratio 
+%B/(A1+A2), where A1 and A2 are the areas of the cells being merged and B 
+%is the area of the new cell formed from their midpoint.
+%
+% numNeighbors - 1xtimesteps array with values the number of neighbors of
+% both cells being merged with no repeats - the number of areas 
+%
+% AreaRedist - 1xtimesteps cell array in which each cell contains a list of
+% the percent change of each neighbor whose area changes at the given
+% timestep DOESNT WORK YET, NOT SURE WHAT THIS VALUE SHOULD REALLY BE
 
 %% Description
 % Constructs a voronoi diagram with (numpoints) points, then for each
 % timestep performs a merging procedure by randomly selecting a point and
 % one of its neighbors to combine. These two points are replaced by a
-% midpoint to simulate droplets of water merging to form a larger droplet.
-
-import containers.Map;
-
+% midpoint to simulate distribution of a resource being moved to a
+% centralized location in order to model city growth in a community with a
+% finite resource
 
 
     visual = false;
-
-
-
-    Areas = cell(1,timesteps);
-
+    
+    Areas = cell(timesteps,1);
+    AreaChange = -ones(timesteps-1,1);
+    numNeighbors = -ones(timesteps,1);
+    AreaRedist = cell(timesteps-1,1);
+    
     %RANDOM POINT DISTRIBUTION
     points_left = numpoints;
     x = rand(points_left,1);
@@ -95,15 +107,28 @@ import containers.Map;
             %Skips the areas that include infinity
             if (~isnan(area))
                 Areas{i}(vertex1) = area;
+                A1 = Areas{i-1}(vertex1);
+                A2 = Areas{i-1}(vertex2);
+                %ratio of the new area to the old combined areas
+                AreaChange(i-1) = area/(A1+A2);
+                %total area that gets redistributed to other cells
+                
+            else
+                Areas{i}(vertex1) = -1;
             end
             
+            
+            AreaRedist{i-1} = -2*ones(size(toUpdate));
             
             %Account for removal of vertex2 from the list of vertices
             for h = 1:length(toUpdate)
                 
-                vertex = toUpdate(h);
+                vertex_shifted = false;
                 
-                if vertex>=vertex2
+                vertex = toUpdate(h);
+                %Account for removal of vertex2 from the list of vertices
+                if vertex>vertex2
+                    vertex_shifted = true;
                     vertex = vertex-1;
                 end
                 
@@ -117,6 +142,12 @@ import containers.Map;
                 %Skips the areas that include infinity
                 if (~isnan(area))
                     Areas{i}(vertex) = area;
+                    %fraction of possible area gained
+                    if vertex_shifted
+                        AreaRedist{i-1}(h) = (area-Areas{i-1}(vertex+1))/(A1+A2 - area);
+                    else
+                        AreaRedist{i-1}(h) = (area-Areas{i-1}(vertex))/(A1+A2 - area);
+                    end
                 end
                 
             end
@@ -197,6 +228,8 @@ import containers.Map;
         %vertex2 without repeats or inclusion of vertex1 or vertex2
         %themseleves
         toUpdate = setdiff(toUpdate,[vertex1,vertex2]);
+        
+        numNeighbors(i) = length(toUpdate);
         
         %check if order preserved in the new triangulation. Probably not,
         %so we may have to manually update the DT calc. ACTUALLY!!!!!!!!!!!
