@@ -22,7 +22,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
 % one of its neighbors to combine. These two points are replaced by a
 % midpoint to simulate distribution of a resource being moved to a
 % centralized location in order to model city growth in a community with a
-% finite resource
+% finite resources
 
 
     visual = false;
@@ -58,8 +58,8 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
     for i = 1:timesteps
         %% MANUAL AREA CODE USING POLYAREAc
         
-        
         [vertices vcells] = voronoiDiagram(dt);
+        
         %%  deal with points that meet outside of the square
         for m = 1:length(vertices)
            
@@ -166,11 +166,12 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
                 if visual
                     fill(xpoints,ypoints, 'r')     
                 end
-
-                if (isnan(area))
-                    continue;           %Skips the areas that include infinity
+                
+                %Skips the areas that include infinity
+                if (~isnan(area))
+                    Areas{i}(j) = area;            
                 end
-                Areas{i}(j) = area;     
+                    
             end
         end
         %NOTE: not all of the area matrix will be filled, the remainder will be
