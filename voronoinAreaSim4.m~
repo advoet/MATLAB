@@ -30,7 +30,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
 % finite resource
 
 
-    visual = false;
+    visual = true;
     
     Areas = cell(timesteps,1);
     AreaChange = -ones(timesteps-1,1);
@@ -46,8 +46,8 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
 %         %UNIFORM POINT DISTRIBUTION
 %     x = .01:.02:.99;
 %     y = .01:.02:.99;
-%    
-%   [x,y] = meshgrid(x,y);
+%     
+%    [x,y] = meshgrid(x,y);
     
     x = x(:);
     y = y(:);
@@ -173,17 +173,18 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
         
         midpoint = [mod((x1+x2)/2,1),mod((y1+y2)/2,1)];
         
-        baseVertex2 = base(vertex2,length(middleIndices));
-        baseVertex1 = base(vertex1,length(middleIndices));
+        baseVertex2 = mod(vertex2,length(middleIndices));
+        baseVertex1 = mod(vertex1,length(middleIndices));
         
         
         
         % get the list of indices of cells (excluding vertex2) that
         % will need updating, modded to the first quadrant
-        toUpdate = setdiff(union(base(v1neighbors,length(middleIndices)), ...
-                                base(v2neighbors,length(middleIndices))), ...
+        toUpdate = setdiff(union(mod(v1neighbors,length(middleIndices)), ...
+                                mod(v2neighbors,length(middleIndices))), ...
                                 baseVertex2);
         
+        toUpdate(toUpdate==0) = length(dt.X)/9;
 
         %shift those after baseVertex2 (will be removed)
         toUpdate(toUpdate>baseVertex2) = toUpdate(toUpdate>baseVertex2)-1;
@@ -232,8 +233,3 @@ end
 
 
 function baseVertex = base(index,numpoints)
-
-    baseVertex = mod(index,numpoints);
-    baseVertex(baseVertex==0) = numpoints;
-    
-end

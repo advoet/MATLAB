@@ -26,6 +26,9 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
 
 
     visual = false;
+    remove_negative = false;
+    
+    
     
     Areas = cell(timesteps,1);
     AreaChange = -ones(timesteps-1,1);
@@ -268,5 +271,11 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoi
         % the voronoi from there but i think its fine
         
         
+    end
+
+    if remove_negative
+        for i =1:timesteps
+            Areas{i} = Areas{i}(find(Areas{i}~=-1));
+        end
     end
 end
