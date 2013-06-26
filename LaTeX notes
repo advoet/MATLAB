@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath,fullpage}
 
 \title{Voronoi Area Redistribution}
 \author{Nick Leger, Alex Voet, Zachary Greenberg, \\ Jourdain Lamperski, Daniel Chupin}
@@ -11,29 +12,55 @@
 
 \section{Derivations}
 
-Let $f(x,t)dx$ denote the numer of cells of area between $x$ and $x + dx$ in the Voronoi diagram at time t.  Then $\int_{a}^b f(x,t) dx$ is the number of cells of area between $a$ and $b$.  Let $N(t) = \int_{0}^\infty f(x,t) dx$ denote the total number of cells at time t.  Then \[\int_{a}^b \frac{f(x,t)}{N(t)}dx\] is the probability of choosing a cell of area $x$ at time t.
+Let $f(x,t)dx$ denote the numer of cells of area between $x$ and $x + dx$ in the Voronoi diagram at time t.  Then $\int_{a}^b f(x,t) dx$ is the number of cells of area between $a$ and $b$.  Let $N(t) = \int_{0}^\infty f(x,t) dx$ denote the total number of cells at time t.  Then \[\int_{a}^b \frac{f(x,t)}{N(t)}dx\] is the probability of choosing a cell of area within $[a,b]$ at time $t$.
 
-\paragraph{}In our model, we define the parameter $\beta$ to be the ratio of the areas of the two merging cells to the area of the resultant cell.  For the moment, we assume $\beta$ to be constant, and equal to around 1.582, but it is really a function of t.  Crucially, this assumption means that any time two cells merge, they will produce, in our model, a cell of area $\beta^{-1}$ of the total area they share.  Furthermore, if x is the area of the rpoduct cell, we assume that the leftover area from the merger, $\beta x - x$, is distributed equally among a constant $m$ neighbors at every time step. 
+\paragraph{}In our model, we define the parameter $\beta$ to be the ratio of the areas of the two merging cells to the area of the resultant cell.  For the moment, we assume $\beta$ to be constant, and equal to around 1.582, but it is really a function of $t$.  Crucially, this assumption means that any time two cells merge, they will produce, in our model, a cell of area $\beta^{-1}$ of the total area they share.  Furthermore, if $x$ is the area of the product cell, we assume that the leftover area from the merger, $\beta x - x$, is distributed equally among a constant $m$ neighbors at every time step. 
 
-\paragraph{}We wish to find an equation for the time derivative of the number of cells of size between $a$ and $b$.  To account for the changes that occur, our initial model will have two gain terms and two loss terms.  They are: (a) gain from the creation of a cell of size x from the merging of two cells; (b) gain from the creation of cells of size x from the distribution of the remaining area; (c) loss from the destruction of merging cells of size x; (d) loss from the destruction of neighbors of size x from the redistribution of area.
+\paragraph{}We wish to find an equation for the time derivative of the number of cells of size between $a$ and $b$.  To account for the changes that occur, our initial model will have two gain terms and two loss terms.  They are: (a) gain from the creation of a cell of size $x$ from the merging of two cells; (b) gain from the creation of cells of size $x$ from the distribution of the remaining area; (c) loss from the destruction of merging cells of size $x$; (d) loss from the destruction of neighbors of size $x$ from the redistribution of area.
 
-\paragraph{}For the first gain term, we simply want to know the probability that the merging cells share a total area $\beta x$ in the range $[a\beta, b\beta]$ between them, since by assumption the product cell will automatically be of area $x$, $a \leq x \leq b$.  Thus, this is simply a convoltution term multiplied by $K$, the rate at which cells merge:
+\paragraph{}For the first gain term, we simply want to know the probability that the merging cells share a total area $\beta x$ in the range $[a\beta, b\beta]$ between them, since by assumption the product cell will automatically be of area $x$, $a \leq x \leq b$.  This is simply a convolution term multiplied by $K$, where $K$ is the number of mergers per unit time:
 
-\[ K\int_{a\beta}^{b\beta}\frac{f \ast f(x,t)}{N(t) N(t)}dx = K\int_{a\beta}^{b\beta}\int_0^{\infty} \frac{f(y,t)f(x-y,t)}{N(t) N(t)}dy dx \]
+\[ K\int_{a\beta}^{b\beta}\frac{f \ast f(x',t)}{N(t) N(t)}dx' = K\int_{a\beta}^{b\beta}\int_0^{\infty} \frac{f(y,t)f(x'-y,t)}{N(t) N(t)}dy dx' \]
 
-Making the substitution $x = \beta x'$, we obtain
+Making the substitution $x' = \beta x$, we obtain
 
-\[ \int_{a\beta}^{b\beta}\frac{f \ast f(x',t)}{N(t) N(t)}dx' \Bigg|_{x = \beta x'} = \int_{a}^{b}\beta\frac{f \ast f(\beta x,t)}{N(t) N(t)}dx = \tilde{f}(x,t)\]
+\[ \int_{a\beta}^{b\beta}\frac{f \ast f(x',t)}{N(t) N(t)}dx' \Bigg|_{x' = \beta x} = \int_{a}^{b}\beta\frac{f \ast f(\beta x,t)}{N(t) N(t)}dx = \int_a^b \tilde{f}(x,t)dx \]
 
-which is the probability of having two cells merge and produce a cell of size $x$.  Hence our first gain term is $K\tilde{f}(x,t)$.
+which is the probability of having two cells merge and produce a cell of size within $[a,b]$.  Hence the number of cells gained via this process is $K\int_a^b \tilde{f}(x,t)dx$.
 
-\paragraph{}For the second gain term, we want to see how many nieghboring cells are bumped into the $[a,b]$ bracket (and neglect the cells that remain in this bracket) by an addition of $\frac{\beta y - y}{m}$ to their area from a product cell of area $y$.  There are $m$ neighbors, so the rate at which this process occurs is $mK$.  Hence, our term is:
 
-\[ mK\int_{0}^{\infty}\int_{a-\frac{\beta y-y}{m}}^{a}}\frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy \]
+Equivalently derived, we can present the probability density function of this gain term as:
+
+\[ \beta\frac{f \ast f(\beta x,t)}{N(t) N(t)} \]
+
+
+
+\paragraph{}For the second gain term, we want to see how many nieghboring cells are bumped into the $[a,b]$ bracket (and neglect the cells that remain in this bracket despite the area change) by an addition of $\alpha (y) = \frac{\beta y - y}{m}$ to their area from a product cell of area $y$.  There are $m$ neighbors, so the rate at which this process occurs is $mK$.  Hence, our term is:
+
+\[ mK\int_0^{\infty}\int_{a-\frac{\beta y-y}{m}}^{a}\frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy \]
+
+
+AV: I think this term (below) is more accurate since it is the raw probability that we gain a cell of size x, summed over all possibilities of y (where $\alpha (y)$ is the area that is delegated to get redistributed into the cell given our merger forms a cell of size y)
+\[ mK\int_{0}^{\infty}\frac{f(x-\alpha (y),t) \tilde{f}(y,t)}{N(t)}dy \]
+
+DC: The only thing I would note is that this seems to give you the probability, given a merger of final size y ranging over all possible y, of gaining a cell of size = [x minus some normalized fudge from redistributions], and I'm confused about what physical interpretation this quantity would have if this fudge over all the y's is accounted for.
 
 \paragraph{}From similar considerations, our second loss term is
 
 \[ mK\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy \]
+
+AV: Similarly, without the integral on the inside, this presents a cleaner representation of a cell of size x being removed by the merger and the cancellation can also be derived from the assumtion of homogeneity of area sizes, in that given we assume cells are merged at rate K and have m neighbors, the probability that one of said neighbors is of size x is simply the second term below.
+
+\[ mK\int_0^{\infty}  \frac{f(x,t) \tilde{f}(y,t)}{N(t)}dy \]
+
+\[ mK \frac{f(x,t)}{N(t)}\]
+
+
+AV: in addition, we can combine the next loss term with this one by similar use of the independance of cell sizes. Each of the (m+2) cells involved in the merging and redistribution process has probability \[ \frac{f(x,t)}{N(t)} \] of being size x. and the entire loss term is presented below:
+
+
+\[ (m+2)K \frac{f(x,t)}{N(t)}\]
+
 
 \paragraph{}Finally, our last term is derived from the probability that the merging cells are of size $x$, $a \leq x \leq b$ to begin with, which is accounted for in the term
 
@@ -43,10 +70,70 @@ which is the probability of having two cells merge and produce a cell of size $x
 
 \[ \int_a^b \frac{\partial}{\partial t}f(x,t)dx = \frac{d}{dt}\int_a^b f(x,t)dx\]
 
-\[ = \int_{a}^{b}\beta\frac{f \ast f(\beta x,t)}{N(t) N(t)}dx + mK\int_{0}^{\infty}\int_{a-\frac{\beta y-y}{m}}^{a}}\frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy\]
+\[ = \int_{a}^{b}\beta\frac{f \ast f(\beta x,t)}{N(t) N(t)}dx + mK\int_{0}^{\infty}\int_{a-\frac{\beta y-y}{m}}^{a}\frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy\]
 \[- mK\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy - 2 K\int_a^{b} \frac{f(x,t)}{N(t)}dx \]
+\\
+
 
 \paragraph{}Note that this equation is a simplification in at least the following sense: we do not account for the fact that, if we restrict ourselves to examining changes in area in the $[a,b]$ window, it is possible that the area to be redistributed to each neighbor is greater than $b-a$.  So we really should have $max[a, b-\frac{\beta y - y}{m}]$ as the second lower bound on our first loss term.
+
+\newpage
+AV (6/26/13) - We combined the model with Nick and used the form without the integral from a to b to make our model easier to read to get a final model of:
+
+
+\[ \beta \frac{f*f(\beta x,t)}{N(t)^2} + m \int_0^\infty \frac{f(x-\frac{(\beta -1)y}{m},t)}{N(t)}  \beta \frac{f*f(\beta y,t)}{N(t)^2}dy - (m+2)\frac{f(x,t)}{N(t)}  \]
+
+Which, simplifying the central term (and substituting $\beta y = z$) gives
+
+\[ \beta \frac{f*f(\beta x,t)}{N(t)^2} + \frac{m}{N(t)^3} \int_0^\infty f(x-\frac{(1- \beta^{-1})}{m}z) f*f(z)dz   - (m+2)\frac{f(x,t)}{N(t)}  \]
+\\
+We now want to derive the weak form of our differential equation in order to gain information about the moments of $f$.
+\\
+\\
+Term 1: (substituting $\beta x = z$ gives us a familiar equation)
+\begin{align*}
+\frac{1}{N(t)^2}\int_0^{\infty} a(x) \beta f*f(\beta x) dx =& 
+\frac{1}{N(t)^2}\int_0^{\infty} a(\frac{z}{\beta}) \beta f*f(z) dx \\
+=& \frac{1}{N(t)^2} \int_0^\infty \int_0^\infty a(\frac{z+y}{\beta})f(z)f(y)dzdy
+\end{align*}
+\\
+\\
+Term 2:
+
+\begin{align*}
+&\frac{m}{N(t)^3} \int_0^\infty a(x) \int_0^\infty f(x-\frac{(1- \beta^{-1})}{m}u) f*f(u)du dx =\\
+& = \frac{m}{N(t)^3} \int_0^\infty\int_0^\infty  a(x) f(x-\frac{(1- \beta^{-1})}{m}u) \left(\int_0^\infty f(u-y)f(y)dy \right)du dx \\ \\
+& \quad w = x-\frac{1-\beta^{-1}}{m}u \qquad dw = dx \\ \\
+& = \frac{m}{N(t)^3} \int_0^\infty\int_0^\infty  a(w+\frac{(1- \beta^{-1})}{m}u) f(w) \left(\int_0^\infty f(u-y)f(y)dy \right)du dw \\ \\
+& \quad z = u-y \quad dz = du \\ \\
+& = \frac{m}{N(t)^3} \int_0^\infty\int_0^\infty  a(w+\frac{(1- \beta^{-1})}{m}(z+y)) f(w) \left(\int_0^\infty f(z)f(y)dy \right)dz dw \\
+& = \frac{m}{N(t)^3} \int_0^\infty\int_0^\infty \int_0^\infty  a(w+\frac{(1- \beta^{-1})}{m}(z+y)) f(w) f(z)f(y)dy dz dw
+\end{align*}
+
+We wish to change the order of integration of x and u. Our u ranges from 0 to $\frac{mx}{1-\beta^{-1}}$, so our integration concerns the area beneath the line $u = \frac{mx}{1-\beta^{-1}}$ and above the line $u = 0$ over the full range of $x$. Hence, switching the bounds of integration, we are interested in the area above the line $x = \frac{(1-\beta^{-1})u}{m}$ over the full range of $u$.  So we get:
+\[ \frac{m}{N(t)^3} \int_0^\infty \int_{{\frac{1-\beta^{-1}}{m}}u}^{\infty} a(x) f(x-\frac{1- \beta^{-1}}{m}u) f*f(u)dx du \]
+
+We now make the substitution $w = x-\frac{1-\beta^{-1}}{m}u$, $dw = dx$. So the bounds on the $w$ integral become desirable:
+\[ \frac{m}{N(t)^3} \int_0^\infty \int_0^{\infty} a(w + \frac{1-\beta^{-1}}{m}u) f(w) f*f(u)dw du \]
+
+
+
+\newpage
+Term 3:
+
+\begin{align*}
+\frac{-(m+2)}{N(t)} \int_0^\infty a(w)f(w)dw &= \frac{-(m+2)}{N(t)^2}\int_0^\infty a(w)f(w)dw \int_0^\infty f(z)dz \int_0^\infty f(y)dy \\
+&= -\frac{1}{N(t)^3} m \int_0^\infty\int_0^\infty\int_0^\infty a(w)f(w)f(z)f(y)dwdzdy \\ & \quad \quad + \int_0^\infty\int_0^\infty\int_0^\infty a(z)f(z)f(w)f(y)dzdwdy \\ & \quad \quad + \int_0^\infty\int_0^\infty\int_0^\infty a(y)f(y)f(z)f(w)dydzdw  \\
+\end{align*}
+\[= \frac{-1}{N(t)^3} \int_0^\infty\int_0^\infty\int_0^\infty \left(m a(w) + a(z) + a(y)\right)f(w)f(y)f(z)dzdydw \]
+\\
+\\
+Combined Terms:
+\[ \frac{\partial}{\partial t} \int_0^{\infty} a(x) f(x,t) dx = \] \\
+\[\frac{1}{N(t)^3} \int_0^\infty\int_0^\infty\int_0^\infty \left(a(\frac{z+y}{\beta})+ma(w+\frac{(1- \beta^{-1})}{m}(z+y))-m a(w) - a(z) - a(y)\right)f(w)f(y)f(z)dzdydw \]
+\\
+Plugging in $a(x) = 1$ we can see that the zeroth moment of the weak form is $-1$, which agrees with the fact that each at each time step we perform one merge operation and eliminate cells at a rate of 1 per unit time.\\
+Plugging in $a(x) = x$ we can see the first moment of our weak form is 0, representing the conservation of total area at each time in our model.
 
 \section{Test Model}
 
@@ -56,16 +143,48 @@ Here we investigate a simple integro-differential equation that describes a proc
 
 (I think we should be careful with our bounds here: not every neighbor of area within the $[a,b]$ window will be bumped out of it during the redistribution.  Maybe the equation should look more like this, but I don't know if it's workable:
 
-\[ \frac{d}{dt}\int_a^b f(x,t)dx = m\int_0^{\infty} \int_{a - \frac{\beta y - y}{m}}^a \frac{f(x,t)}{N(t)}\frac{f(y,t)}{N(t)}dx dy \]
-\[- m\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t)}{N(t)}\frac{f(y,t)}{N(t)}dx dy - \int_a^b \frac{f(x,t)}{N(t)}dx \]
+\begin{align*}
+\frac{d}{dt}\int_a^b f(x,t)dx &= m\int_0^{\infty} \int_{a - \frac{\beta y - y}{m}}^a \frac{f(x,t)}{N(t)}\frac{f(y,t)}{N(t)}dx dy\\
+&- m\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t)}{N(t)}\frac{f(y,t)}{N(t)}dx dy - \int_a^b \frac{f(x,t)}{N(t)}dx
+\end{align*}
 
 Nevertheless, the simpler test model yields good results, so maybe it's good!).
 
 
+\section{Some Notes}
+
+We should be mindful that we do not overcount or undercount in our formal model.  We run this risk in the first gain term and the second loss term.  
+
+What is the probability that...
+
+\begin{enumerate}
+
+\item One cell of area $y$ in $[a,b]$ is merged with another (of unspecified area range) to create a cell in $[a,b]$:
+
+\[ \int_{a}^{b}\int_a^b \beta \frac{f(y,t)f(\beta x-y,t)}{N(t) N(t)}dy dx\]
+
+\item Two cells of area in $[a,b]$ are merged to create a cell in $[a,b]$:
+
+\[ \int_{max[a,\beta a - a]}^{min[b,\beta b - b]}\int_a^b  \frac{f(y,t)f(x-y,t)}{N(t) N(t)}dy dx\]
+
+The reasoning is: the convolution integral is now ranging over y's that are in the $[a,b]$ bracket (we are merging two cells of size y and x-y, and want the final area to be within 
+
+\item Two cells of area $x$ in $[a,b]$ inintially are merged to produce a cell of area in $[a,b]$:
+
+\[ \left[ \int_a^b \frac{f(x,t)}{N(t)}dx \right]^2 \int_a^b \tilde{f}(x,t)dx \]
 
 
+This is counted as a gain in our first gain term, but it is in fact a net loss.  So we must subtract off two factors of this expression.
 
+\item Two cells, one of area in $[a,b]$ and the other not, are merged to produce a cell of area in $[a,b]$:
 
+\[ 2 \left[ \int_a^b \frac{f(x,t)}{N(t)}dx \right]\left[1- \int_a^b \frac{f(x,t)}{N(t)}dx \right] \int_a^b \tilde{f}(x,t)dx\]
+
+The factor of 2 is present because there are two such configurations.  The first gain term treats this as a single gain.  But it is in fact a net zero gain.  So we must subtract off one factor of this expression.
+
+\paragraph{} Note: These probabilities do not look very right to me: in these specific cases, the probability that the merger will result in a cell of area within $[a,b]$ is different from the probabilistic upshot of a bunch of random convolutions; $\tilde{f}(x,t)$ should depend in some way on the kinds of areas that we are convolving.  We certainly account for the incidence of these areas, but we do not account for the ease or difficulty with which these choices of areas will produce a cell of size within $[a,b]$.
+
+\end{enumerate}
 
 
 
