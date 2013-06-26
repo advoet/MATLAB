@@ -1,0 +1,96 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Voronoi Area Redistribution}
+\author{Nick Leger, Alex Voet, Zachary Greenberg, \\ Jourdain Lamperski, Daniel Chupin}
+\date{June - July 2013}
+
+\begin{document}
+
+\maketitle
+
+\section{Derivations}
+
+Let $f(x,t)dx$ denote the numer of cells of area between $x$ and $x + dx$ in the Voronoi diagram at time t.  Then $\int_{a}^b f(x,t) dx$ is the number of cells of area between $a$ and $b$.  Let $N(t) = \int_{0}^\infty f(x,t) dx$ denote the total number of cells at time t.  Then \[\int_{a}^b \frac{f(x,t)}{N(t)}dx\] is the probability of choosing a cell of area $x$ at time t.
+
+\paragraph{}In our model, we define the parameter $\beta$ to be the ratio of the areas of the two merging cells to the area of the resultant cell.  For the moment, we assume $\beta$ to be constant, and equal to around 1.582, but it is really a function of t.  Crucially, this assumption means that any time two cells merge, they will produce, in our model, a cell of area $\beta^{-1}$ of the total area they share.  Furthermore, if x is the area of the rpoduct cell, we assume that the leftover area from the merger, $\beta x - x$, is distributed equally among a constant $m$ neighbors at every time step. 
+
+\paragraph{}We wish to find an equation for the time derivative of the number of cells of size between $a$ and $b$.  To account for the changes that occur, our initial model will have two gain terms and two loss terms.  They are: (a) gain from the creation of a cell of size x from the merging of two cells; (b) gain from the creation of cells of size x from the distribution of the remaining area; (c) loss from the destruction of merging cells of size x; (d) loss from the destruction of neighbors of size x from the redistribution of area.
+
+\paragraph{}For the first gain term, we simply want to know the probability that the merging cells share a total area $\beta x$ in the range $[a\beta, b\beta]$ between them, since by assumption the product cell will automatically be of area $x$, $a \leq x \leq b$.  Thus, this is simply a convoltution term multiplied by $K$, the rate at which cells merge:
+
+\[ K\int_{a\beta}^{b\beta}\frac{f \ast f(x,t)}{N(t) N(t)}dx = K\int_{a\beta}^{b\beta}\int_0^{\infty} \frac{f(y,t)f(x-y,t)}{N(t) N(t)}dy dx \]
+
+Making the substitution $x = \beta x'$, we obtain
+
+\[ \int_{a\beta}^{b\beta}\frac{f \ast f(x',t)}{N(t) N(t)}dx' \Bigg|_{x = \beta x'} = \int_{a}^{b}\beta\frac{f \ast f(\beta x,t)}{N(t) N(t)}dx = \tilde{f}(x,t)\]
+
+which is the probability of having two cells merge and produce a cell of size $x$.  Hence our first gain term is $K\tilde{f}(x,t)$.
+
+\paragraph{}For the second gain term, we want to see how many nieghboring cells are bumped into the $[a,b]$ bracket (and neglect the cells that remain in this bracket) by an addition of $\frac{\beta y - y}{m}$ to their area from a product cell of area $y$.  There are $m$ neighbors, so the rate at which this process occurs is $mK$.  Hence, our term is:
+
+\[ mK\int_{0}^{\infty}\int_{a-\frac{\beta y-y}{m}}^{a}}\frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy \]
+
+\paragraph{}From similar considerations, our second loss term is
+
+\[ mK\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy \]
+
+\paragraph{}Finally, our last term is derived from the probability that the merging cells are of size $x$, $a \leq x \leq b$ to begin with, which is accounted for in the term
+
+\[ 2 K\int_a^{b} \frac{f(x,t)}{N(t)}dx \]
+
+\paragraph{}Putting this all together, our full equation is
+
+\[ \int_a^b \frac{\partial}{\partial t}f(x,t)dx = \frac{d}{dt}\int_a^b f(x,t)dx\]
+
+\[ = \int_{a}^{b}\beta\frac{f \ast f(\beta x,t)}{N(t) N(t)}dx + mK\int_{0}^{\infty}\int_{a-\frac{\beta y-y}{m}}^{a}}\frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy\]
+\[- mK\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t) \tilde{f}(y,t)}{N(t)}dx dy - 2 K\int_a^{b} \frac{f(x,t)}{N(t)}dx \]
+
+\paragraph{}Note that this equation is a simplification in at least the following sense: we do not account for the fact that, if we restrict ourselves to examining changes in area in the $[a,b]$ window, it is possible that the area to be redistributed to each neighbor is greater than $b-a$.  So we really should have $max[a, b-\frac{\beta y - y}{m}]$ as the second lower bound on our first loss term.
+
+\section{Test Model}
+
+Here we investigate a simple integro-differential equation that describes a process in which, at each step, a random cell is equitably redistributed among $m$ neighbors.  Our working equation is
+
+\[ \frac{d}{dt}\int_a^b f(x,t)dx = m \int_a^b \int_0^{\infty} \frac{f(x-\frac{y}{m},t)}{N(t)}\frac{f(y,t)}{N(t)}dy dx - (m+1) \int_a^b \frac{f(x,t)}{N(t)}dx \]
+
+(I think we should be careful with our bounds here: not every neighbor of area within the $[a,b]$ window will be bumped out of it during the redistribution.  Maybe the equation should look more like this, but I don't know if it's workable:
+
+\[ \frac{d}{dt}\int_a^b f(x,t)dx = m\int_0^{\infty} \int_{a - \frac{\beta y - y}{m}}^a \frac{f(x,t)}{N(t)}\frac{f(y,t)}{N(t)}dx dy \]
+\[- m\int_0^{\infty} \int_{b - \frac{\beta y - y}{m}}^b \frac{f(x,t)}{N(t)}\frac{f(y,t)}{N(t)}dx dy - \int_a^b \frac{f(x,t)}{N(t)}dx \]
+
+Nevertheless, the simpler test model yields good results, so maybe it's good!).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
