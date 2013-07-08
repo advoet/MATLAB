@@ -37,16 +37,16 @@ for i = 1:lenArray
     if mod(i,framerate) == 0;
         
         %fits and evaluates a gaussian curve to the data
-        [sigma,mu,alpha] = mygaussfit(X,y);
+      %  [sigma,mu,alpha] = mygaussfit(X,y);
         
         %output all of the coefficients for gauss fit.
-        sigmas(i/framerate) = sigma;
-        alphas(i/framerate) = alpha;
-        mus(i/framerate) = mu;
+       % sigmas(i/framerate) = sigma;
+       % alphas(i/framerate) = alpha;
+       % mus(i/framerate) = mu;
         
         
-        y2 = alpha/(2*sigma)*exp(-(X-mu).^2/(2*sigma^2));
-        
+       % y2 = alpha/(2*sigma)*exp(-(X-mu).^2/(2*sigma^2));
+        y2 = fit(X',y','gauss2');
       
         
         
@@ -54,7 +54,7 @@ for i = 1:lenArray
         hold on;
         
         
-        plot(X,y2,'r','LineWidth',3)
+        plot(y2,'r');
        
         axis([0, endBound, 0, 1.2]);
         hold off;
