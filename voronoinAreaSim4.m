@@ -1,4 +1,4 @@
-function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim3(numpoints,timesteps)
+function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoints,timesteps)
 
 %PERIODIC SIMULATION, ONLY COMPUTES THE AREAS OF THE POINTS IN THE MIDDLE
 %CELL, PERIODIC CONSTRAINT FORCES AREAS TO WRAP AROUND AND STILL TOTAL 1
