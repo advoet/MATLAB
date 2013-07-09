@@ -13,7 +13,7 @@ dx = 1/10;
 
 %Finding the biggest area value that will need to be plotted at the last
 %time step so that a good bound for plotting is chosen. 
-endBound = max(Areas{lenArray/2})*length(Areas{lenArray/2}); 
+endBound = max(Areas{floor(lenArray/2)})*length(Areas{floor(lenArray/2)}); 
 X = 0:dx:endBound;
 Y = cell(size(Areas));
 %Plotting the rescaled density function. 
@@ -36,25 +36,16 @@ for i = 1:lenArray
     
     if mod(i,framerate) == 0;
         
-        %fits and evaluates a gaussian curve to the data
-      %  [sigma,mu,alpha] = mygaussfit(X,y);
+        %fits a gaussian curve to the data. looks pretty but doesnt really
+        %help with anything. Also fit does not work on my comp -AV
         
-        %output all of the coefficients for gauss fit.
-       % sigmas(i/framerate) = sigma;
-       % alphas(i/framerate) = alpha;
-       % mus(i/framerate) = mu;
-        
-        
-       % y2 = alpha/(2*sigma)*exp(-(X-mu).^2/(2*sigma^2));
-        y2 = fit(X',y','gauss2');
-      
-        
+        %y2 = fit(X',y','gauss2');             
         
         bar(X,y);
         hold on;
         
         
-        plot(y2,'r');
+        %plot(y2,'r');
        
         axis([0, endBound, 0, 1.2]);
         hold off;

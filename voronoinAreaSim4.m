@@ -1,4 +1,4 @@
-function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoints,timesteps)
+function [Areas, Betas, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoints,timesteps)
 
 %PERIODIC SIMULATION, ONLY COMPUTES THE AREAS OF THE POINTS IN THE MIDDLE
 %CELL, PERIODIC CONSTRAINT FORCES AREAS TO WRAP AROUND AND STILL TOTAL 1
@@ -10,8 +10,8 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
 %diagram along with values of -1 (representing areas that had a
 %vertex at infinity)
 %
-% AreaChange -  1x(timesteps-1) array with values of the ratio 
-%B/(A1+A2), where A1 and A2 are the areas of the cells being merged and B 
+% Betas -  1x(timesteps-1) array with values of the ratio 
+%(A1+A2)/B, where A1 and A2 are the areas of the cells being merged and B 
 %is the area of the new cell formed from their midpoint.
 %
 % numNeighbors - 1xtimesteps array with values the number of neighbors of
@@ -19,7 +19,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
 %
 % AreaRedist - 1xtimesteps cell array in which each cell contains a list of
 % the percent change of each neighbor whose area changes at the given
-% timestep DOESNT WORK YET, NOT SURE WHAT THIS VALUE SHOULD REALLY BE
+% timestep NOT IMPLEMENTED
 
 %% Description
 % Constructs a voronoi diagram with (numpoints) points, then for each
@@ -33,7 +33,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
     visual = false;
     
     Areas = cell(timesteps,1);
-    AreaChange = -ones(timesteps-1,1);
+    Betas = -ones(timesteps-1,1);
     numNeighbors = -ones(timesteps,1);
     AreaRedist = cell(timesteps-1,1);
     
@@ -112,6 +112,16 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
                 Areas{i}(toUpdateIndex(h)) = area;
             end
             
+            %sometimes vertex1 is larger than vertex 2 so it gets shifted
+            if baseVertex1<baseVertex2
+                Betas(i-1) = (Areas{i-1}(baseVertex1) + ...
+                    Areas{i-1}(baseVertex2))/Areas{i}(baseVertex1);
+            else
+                Betas(i-1) = (Areas{i-1}(baseVertex1) + ...
+                    Areas{i-1}(baseVertex2))/Areas{i}(baseVertex1-1);
+            end
+            
+            
         else
             
             for j = 1:length(dt.X)/9
@@ -148,7 +158,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
         
         neighborSet = edges(dt);
         
-        [vertex1] = randi([middleIndices(1),middleIndices(end)]);
+        vertex1 = randi([middleIndices(1),middleIndices(end)]);
 
         [v1x,v1y] = find(neighborSet==vertex1);
         v1y = 3.-v1y;
@@ -157,7 +167,6 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
         v1neighbors = neighborSet(idx);
         
         vertex2 = v1neighbors(randi(length(v1neighbors)));
-        
         
         
         
@@ -193,7 +202,7 @@ function [Areas, AreaChange, numNeighbors, AreaRedist] = voronoinAreaSim4(numpoi
         toUpdateArea = toUpdate + 4*(length(middleIndices)-1);
         
         
-        
+        %NO LONGER THE CASE. LEAVING COMMENT FOR POSTERITY
         %This is due to voronoiPrep filling blocks of vertices in order
         % 3,6,9
         % 2,5,8
