@@ -11,7 +11,7 @@ points = {[0,1,1i]};
 end 
 
  
-beta = 1.582; 
+beta = 1.6144; 
 alpha = (beta-1)/(beta*m); 
 
 for n = 1:floor(endBound/h) 

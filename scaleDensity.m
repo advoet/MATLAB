@@ -3,7 +3,7 @@ function [ m,X,Y] = scaleDensity(Areas,framerate)
 %(1/N(t)^2)*(f(t,(x/N(t)))). It takes a cell array as input. 
 
 
-
+[xvalues,yvalues] = gapprox2();
 
 %length of cell array. 
 lenArray = length(Areas); 
@@ -41,16 +41,16 @@ for i = 1:lenArray
         
         %y2 = fit(X',y','gauss2');             
         
-        bar(X,y);
+        plot(X,y,'b');
         hold on;
         
+        plot(xvalues,yvalues,'r')
         
         %plot(y2,'r');
        
-        axis([0, endBound, 0, 1.2]);
+        axis([0, endBound, 0, 2]);
         hold off;
         m(i/framerate) = getframe();
-        display(i)
     end
     
 

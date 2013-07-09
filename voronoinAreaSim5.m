@@ -33,9 +33,9 @@ function Areas = voronoinAreaSim5(numpoints,timesteps,beta,mNeighbors)
 %         %UNIFORM POINT DISTRIBUTION
 %     x = .01:.02:.99;
 %     y = .01:.02:.99;
-%    
+%     numpoints = length(x)^2;
 %   [x,y] = meshgrid(x,y);
-    
+%     
     x = x(:);
     y = y(:);
     
@@ -43,7 +43,6 @@ function Areas = voronoinAreaSim5(numpoints,timesteps,beta,mNeighbors)
     [x,y] = voronoiPrep(x,y);
     points = [x,y];
 
-    
     dt = DelaunayTri(points(:,1),points(:,2));
     [vertices vcells] = voronoiDiagram(dt);
     
